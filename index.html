@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daniel Kamali | Infrastructure & AI Engineer</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root {
     --bg: #0a0a14;
@@ -1500,19 +1501,19 @@
       <h2 class="section-title">Thoughts & <span>Writings</span></h2>
     </div>
     <div class="blog-grid">
-      <div class="blog-card" onclick="openBlog('blog-ai-team.html')" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('/blog/ai-team')" style="cursor:pointer;">
         <div class="blog-tag">AI & Infrastructure</div>
         <div class="blog-title">Building an AI-First Infrastructure Team in Africa</div>
         <div class="blog-excerpt">How I'm driving AI adoption at Deriv Africa, from building internal tools to getting the team thinking in automation-first workflows. It's been more cultural than technical.</div>
         <div class="blog-meta"><span>April 2026</span><span>5 min read</span></div>
       </div>
-      <div class="blog-card" onclick="openBlog('blog-okta-iam.html')" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('/blog/okta-iam')" style="cursor:pointer;">
         <div class="blog-tag">Automation</div>
         <div class="blog-title">Okta Workflows: Automating IAM Without Code</div>
         <div class="blog-excerpt">A practical walkthrough of building end-to-end provisioning pipelines using Okta Workflows, ClickUp, and GitHub. No traditional dev background needed, just logic and patience.</div>
         <div class="blog-meta"><span>March 2026</span><span>8 min read</span></div>
       </div>
-      <div class="blog-card" onclick="openBlog('blog-irema.html')" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('/blog/irema')" style="cursor:pointer;">
         <div class="blog-tag">Startups</div>
         <div class="blog-title">Lessons from Building Irema: Rwanda's Business Review Platform</div>
         <div class="blog-excerpt">What I've picked up building a multilingual, mobile-first product for the East African market. The technical side was straightforward. The cultural and business side took a lot more thinking.</div>
@@ -1555,21 +1556,22 @@
         <div class="contact-form">
           <div class="form-group">
             <label class="form-label">your_name</label>
-            <input type="text" class="form-input" placeholder="Jane Recruiter">
+            <input id="contact-name" type="text" class="form-input" placeholder="Jane Recruiter">
           </div>
           <div class="form-group">
             <label class="form-label">your_email</label>
-            <input type="email" class="form-input" placeholder="jane@company.com">
+            <input id="contact-email" type="email" class="form-input" placeholder="jane@company.com">
           </div>
           <div class="form-group">
             <label class="form-label">subject</label>
-            <input type="text" class="form-input" placeholder="Opportunity / Collaboration / Just saying hi">
+            <input id="contact-subject" type="text" class="form-input" placeholder="Opportunity / Collaboration / Just saying hi">
           </div>
           <div class="form-group">
             <label class="form-label">message</label>
-            <textarea class="form-input" placeholder="Tell me about the role, project or idea..."></textarea>
+            <textarea id="contact-message" class="form-input" placeholder="Tell me about the role, project or idea..."></textarea>
           </div>
-          <button class="btn-primary" style="align-self:flex-start" onclick="alert('Thanks! Daniel will get back to you soon.')">send_message()</button>
+          <button id="send-btn" class="btn-primary" style="align-self:flex-start" onclick="sendMessage()">send_message()</button>
+          <div id="form-status" style="font-family:var(--mono);font-size:12px;margin-top:8px;display:none;"></div>
         </div>
       </div>
     </div>
@@ -1617,6 +1619,57 @@
 </div>
 
 <script>
+  // EmailJS — replace these with your real IDs after setup
+  var EMAILJS_PUBLIC_KEY = 'cqaOLir_xEL72znZR';
+  var EMAILJS_SERVICE_ID = 'service_li0xd9c';
+  var EMAILJS_TEMPLATE_ID = 'template_ra5692d';
+
+  function sendMessage() {
+    var name    = document.getElementById('contact-name').value.trim();
+    var email   = document.getElementById('contact-email').value.trim();
+    var subject = document.getElementById('contact-subject').value.trim();
+    var message = document.getElementById('contact-message').value.trim();
+    var status  = document.getElementById('form-status');
+    var btn     = document.getElementById('send-btn');
+
+    if (!name || !email || !message) {
+      status.style.display = 'block';
+      status.style.color = 'var(--cyan)';
+      status.textContent = 'please fill in your name, email and message.';
+      return;
+    }
+
+    btn.textContent = 'sending...';
+    btn.disabled = true;
+    status.style.display = 'none';
+
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      from_name:  name,
+      from_email: email,
+      name:       name,
+      email:      email,
+      subject:    subject || 'New message from danielztech.com',
+      message:    message,
+      to_email:   'danielkamali20@gmail.com'
+    }).then(function() {
+      btn.textContent = 'message_sent()';
+      status.style.display = 'block';
+      status.style.color = 'var(--green)';
+      status.textContent = 'message sent. Daniel will be in touch soon.';
+      document.getElementById('contact-name').value = '';
+      document.getElementById('contact-email').value = '';
+      document.getElementById('contact-subject').value = '';
+      document.getElementById('contact-message').value = '';
+      setTimeout(function(){ btn.textContent = 'send_message()'; btn.disabled = false; }, 4000);
+    }, function(error) {
+      btn.textContent = 'send_message()';
+      btn.disabled = false;
+      status.style.display = 'block';
+      status.style.color = '#f87171';
+      status.textContent = 'something went wrong. please email danielkamali20@gmail.com directly.';
+    });
+  }
   // Renamed to avoid clashing with window.scrollTo()
   function navScrollTo(id) {
     var el = document.getElementById(id);
@@ -1658,6 +1711,16 @@
     try {
       var saved = localStorage.getItem('dk-theme');
       if (saved === 'light') document.documentElement.classList.add('light');
+    } catch(e) {}
+    // Restore scroll position from blog back-link
+    try {
+      var scrollTarget = sessionStorage.getItem('scrollTo');
+      if (scrollTarget) {
+        sessionStorage.removeItem('scrollTo');
+        window.addEventListener('load', function() {
+          setTimeout(function() { navScrollTo(scrollTarget); }, 300);
+        });
+      }
     } catch(e) {}
   })();
 

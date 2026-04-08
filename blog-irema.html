@@ -148,7 +148,7 @@
     </div>
 
     <div class="post-footer">
-      <a href="javascript:void(0)" onclick="goHome(); setTimeout(()=>document.getElementById('blog').scrollIntoView({behavior:'smooth'}),300)" class="back-btn">&#8592; all posts</a>
+      <a href="javascript:void(0)" onclick="goHome(); sessionStorage.setItem('scrollTo','blog')" class="back-btn">&#8592; all posts</a>
       <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">daniel@kigali</span>
     </div>
   </div>
@@ -162,7 +162,7 @@
 </footer>
 
 <script>
-  function goHome() { window.location.href = 'index.html'; }
+  function goHome() { window.location.href = '/'; }
   function toggleTheme() {
     var html = document.documentElement;
     var isLight = html.classList.toggle('light');

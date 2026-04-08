@@ -1,1 +1,17 @@
-{"hosting":{"public":".","ignore":["firebase.json",".firebaserc","**/.*","**/node_modules/**"]}}
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      { "source": "/blog/ai-team",  "destination": "/blog-ai-team.html" },
+      { "source": "/blog/okta-iam", "destination": "/blog-okta-iam.html" },
+      { "source": "/blog/irema",    "destination": "/blog-irema.html" }
+    ]
+  }
+}
