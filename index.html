@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Kamali | Infrastructure & AI Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a14;
+    --bg2: #0e0e1c;
+    --bg3: #12122a;
+    --purple: #7c3aed;
+    --purple-light: #a78bfa;
+    --purple-dim: #4c1d95;
+    --green: #00ff88;
+    --green-dim: #00cc6a;
+    --green-dark: #003322;
+    --cyan: #22d3ee;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #475569;
+    --border: rgba(124,58,237,0.2);
+    --border-green: rgba(0,255,136,0.15);
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+    --nav-bg: rgba(10,10,20,0.85);
+    --nav-mobile-bg: #0a0a14;
+    --hero-glow: rgba(124,58,237,0.12);
+    --grid-line: rgba(124,58,237,0.04);
+    --scanline: rgba(0,0,0,0.03);
+    --terminal-bg: #000;
+    --terminal-bar: #111;
+    --stat-num-color: var(--purple-light);
+  }
+
+  html.light {
+    --bg: #f8f7ff;
+    --bg2: #f0eeff;
+    --bg3: #e8e3ff;
+    --purple: #6d28d9;
+    --purple-light: #7c3aed;
+    --purple-dim: #ede9fe;
+    --green: #059669;
+    --green-dim: #047857;
+    --green-dark: #d1fae5;
+    --cyan: #0e7490;
+    --text: #1e1b4b;
+    --text-muted: #4c4980;
+    --text-dim: #7c7aaa;
+    --border: rgba(109,40,217,0.15);
+    --border-green: rgba(5,150,105,0.2);
+    --nav-bg: rgba(248,247,255,0.92);
+    --nav-mobile-bg: #f8f7ff;
+    --hero-glow: rgba(124,58,237,0.07);
+    --grid-line: rgba(109,40,217,0.04);
+    --scanline: rgba(0,0,0,0.0);
+    --terminal-bg: #1e1b4b;
+    --terminal-bar: #2d2a6e;
+    --stat-num-color: #6d28d9;
+  }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .theme-toggle .icon-moon { display: block; }
+  .theme-toggle .icon-sun  { display: none; }
+  html.light .theme-toggle .icon-moon { display: none; }
+  html.light .theme-toggle .icon-sun  { display: block; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scanline) 2px, var(--scanline) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Grid background */
+  .grid-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--green);
+    letter-spacing: 0.05em;
+  }
+
+  .nav-logo span { color: var(--purple-light); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--green); }
+
+  .nav-cta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 6px 16px;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .nav-cta:hover { background: var(--green); color: #000; }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 0 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--hero-glow) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-terminal {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .hero-terminal::before { content: '> '; color: var(--purple-light); }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--green);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  .hero-name .first {
+    color: var(--text);
+    display: block;
+  }
+  .hero-name .last {
+    color: var(--purple-light);
+    display: block;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-title {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--cyan);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  .hero-desc {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+  }
+
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 1s forwards;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .badge-green {
+    background: var(--green-dark);
+    color: var(--green);
+    border: 1px solid rgba(0,255,136,0.3);
+  }
+
+  .badge-purple {
+    background: rgba(76,29,149,0.3);
+    color: var(--purple-light);
+    border: 1px solid rgba(167,139,250,0.3);
+  }
+
+  .badge-cyan {
+    background: rgba(34,211,238,0.08);
+    color: var(--cyan);
+    border: 1px solid rgba(34,211,238,0.2);
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.2s forwards;
+  }
+
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    padding: 14px 32px;
+    background: var(--purple);
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+
+  .btn-outline {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    padding: 14px 32px;
+    background: transparent;
+    color: var(--green);
+    text-decoration: none;
+    border: 1px solid var(--green);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: inline-block;
+  }
+
+  .btn-outline:hover { background: var(--green); color: #000; }
+
+  .hero-stats {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+
+  .stat-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 20px 28px;
+    text-align: right;
+    position: relative;
+  }
+
+  .stat-block::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--purple);
+  }
+
+  .stat-num {
+    font-family: var(--display);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--stat-num-color);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(20px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity:0; }
+    to { opacity:1; }
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--green);
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+  }
+
+  .section-title span { color: var(--purple-light); }
+
+  /* ABOUT */
+  #about {
+    padding: 100px 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .about-text p {
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .terminal-box {
+    background: var(--terminal-bg);
+    border: 1px solid var(--border-green);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    background: var(--terminal-bar);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-green);
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .t-prompt { color: var(--purple-light); }
+  .t-cmd { color: var(--text); }
+  .t-out { color: var(--green); }
+  .t-comment { color: var(--text-dim); }
+
+  /* SKILLS */
+  #skills {
+    padding: 100px 0;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .skill-category {
+    background: var(--bg);
+    padding: 2rem;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .skill-category:hover { background: var(--bg2); }
+
+  .skill-cat-icon {
+    font-family: var(--mono);
+    font-size: 20px;
+    margin-bottom: 0.75rem;
+  }
+
+  .skill-cat-name {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .skill-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    background: rgba(124,58,237,0.1);
+    color: var(--purple-light);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 2px;
+  }
+
+  .skill-tag.green {
+    background: rgba(0,255,136,0.06);
+    color: var(--green-dim);
+    border-color: rgba(0,255,136,0.15);
+  }
+
+  .skill-tag.cyan {
+    background: rgba(34,211,238,0.06);
+    color: var(--cyan);
+    border-color: rgba(34,211,238,0.15);
+  }
+
+  /* EXPERIENCE */
+  #experience {
+    padding: 100px 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exp-timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .exp-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--purple), var(--green-dim), transparent);
+  }
+
+  .exp-item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exp-item:last-child { border-bottom: none; margin-bottom: 0; }
+
+  .exp-dot {
+    position: absolute;
+    left: -46px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--purple);
+    background: var(--bg2);
+    transform: rotate(45deg);
+  }
+
+  .exp-item:first-child .exp-dot {
+    border-color: var(--green);
+    background: rgba(0,255,136,0.2);
+  }
+
+  .exp-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .exp-company {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--purple-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .exp-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+  }
+
+  .exp-current {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    background: rgba(0,255,136,0.1);
+    color: var(--green);
+    border: 1px solid rgba(0,255,136,0.3);
+    letter-spacing: 0.08em;
+  }
+
+  .exp-role {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .exp-bullets {
+    list-style: none;
+  }
+
+  .exp-bullets li {
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .exp-bullets li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+    font-size: 10px;
+    top: 7px;
+  }
+
+  /* PROJECTS */
+  #portfolio {
+    padding: 100px 0;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .project-card {
+    background: var(--bg);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .project-card:hover { background: var(--bg3); }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--green));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+
+  .project-card:hover::before { transform: scaleX(1); }
+
+  .project-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  .project-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .project-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* BLOG */
+  #blog {
+    padding: 100px 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .blog-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .blog-card:hover {
+    border-color: rgba(124,58,237,0.4);
+    transform: translateY(-2px);
+  }
+
+  .blog-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .blog-title {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .blog-excerpt {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .blog-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 16px;
+  }
+
+  /* CERTIFICATIONS */
+  #certifications {
+    padding: 80px 0;
+  }
+
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .cert-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .cert-item:hover { border-color: rgba(124,58,237,0.4); }
+
+  .cert-icon {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--purple-light);
+    flex-shrink: 0;
+  }
+
+  .cert-name {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 100px 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .contact-info p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .contact-link:hover {
+    border-color: var(--green);
+    background: var(--bg3);
+  }
+
+  .contact-link-icon {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--green);
+    width: 20px;
+  }
+
+  .contact-link-text {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .form-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus {
+    border-color: rgba(124,58,237,0.5);
+  }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .footer-logo span { color: var(--green); }
+
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* Mobile nav toggle */
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* Light mode badge overrides */
+  html.light .badge-green {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: rgba(5,150,105,0.35);
+  }
+  html.light .badge-purple {
+    background: #ede9fe;
+    color: #4c1d95;
+    border-color: rgba(109,40,217,0.3);
+  }
+  html.light .badge-cyan {
+    background: #cffafe;
+    color: #164e63;
+    border-color: rgba(14,116,144,0.3);
+  }
+  html.light .hero-name .last {
+    color: var(--purple-light);
+  }
+  html.light .skill-tag {
+    background: rgba(109,40,217,0.08);
+    color: #4c1d95;
+    border-color: rgba(109,40,217,0.2);
+  }
+  html.light .skill-tag.green {
+    background: rgba(5,150,105,0.08);
+    color: #065f46;
+    border-color: rgba(5,150,105,0.2);
+  }
+  html.light .skill-tag.cyan {
+    background: rgba(14,116,144,0.08);
+    color: #164e63;
+    border-color: rgba(14,116,144,0.2);
+  }
+  html.light .blog-card:hover { border-color: rgba(109,40,217,0.4); }
+  html.light .cert-item:hover { border-color: rgba(109,40,217,0.4); }
+  html.light .form-input { color: var(--text); }
+  html.light .form-input::placeholder { color: var(--text-dim); }
+  html.light .btn-primary { background: var(--purple); }
+  html.light .btn-primary:hover { background: #5b21b6; }
+  html.light .btn-outline { color: var(--green); border-color: var(--green); }
+  html.light .btn-outline:hover { background: var(--green); color: #fff; }
+  html.light .nav-cta { color: var(--green); border-color: var(--green); }
+  html.light .nav-cta:hover { background: var(--green); color: #fff; }
+  html.light .exp-current {
+    background: rgba(5,150,105,0.1);
+    color: #065f46;
+    border-color: rgba(5,150,105,0.3);
+  }
+  html.light .skill-category:hover { background: var(--bg3); }
+  html.light .project-card:hover { background: var(--bg3); }
+  html.light .contact-link:hover { background: var(--bg3); border-color: var(--green); }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .nav-toggle { display: block; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 60px; left: 0; right: 0;
+      background: var(--nav-mobile-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      gap: 1.25rem;
+    }
+    .hero-stats { display: none; }
+    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .hero-name { font-size: clamp(2.5rem, 12vw, 4rem); }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">&gt; <span>daniel_kamali</span>.sh</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="javascript:void(0)" onclick="scrollTo('about')">about</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollTo('skills')">skills</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollTo('experience')">experience</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollTo('portfolio')">portfolio</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollTo('blog')">blog</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollTo('contact')">contact</a></li>
+  </ul>
+  <a href="javascript:void(0)" onclick="scrollTo('contact')" class="nav-cta">hire_me</a>
+  <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode" onclick="toggleTheme()">
+    <span class="icon-moon">☽</span>
+    <span class="icon-sun">☀</span>
+  </button>
+  <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">≡ menu</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="hero-terminal">whoami: infrastructure_engineer | ai_champion | entrepreneur<span class="cursor"></span></div>
+    <h1 class="hero-name">
+      <span class="first">Daniel</span><br>
+      <span class="last">Kamali</span>
+    </h1>
+    <div class="hero-title">// Linux · Cloud · AI · Infrastructure</div>
+    <p class="hero-desc">
+      Linux &amp; Infrastructure Engineer with 8+ years supporting, securing, and automating production systems across global environments. I have a strong background in Linux administration, network reliability, cloud infrastructure, monitoring, and automation. Over the years I've built a solid track record reducing downtime, improving system visibility, and keeping business-critical infrastructure running for distributed teams around the clock.
+    </p>
+    <div class="hero-badges">
+      <span class="badge badge-green">Kigali, Rwanda</span>
+      <span class="badge badge-purple">8+ Years Experience</span>
+      <span class="badge badge-cyan">Open to Remote</span>
+      <span class="badge badge-green">AI Champion</span>
+      <span class="badge badge-purple">Founder · Irema</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="javascript:void(0)" onclick="scrollTo('contact')" class="btn-primary">get_in_touch()</a>
+      <a href="javascript:void(0)" onclick="scrollTo('portfolio')" class="btn-outline">view_work()</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-block">
+      <div class="stat-num">8+</div>
+      <div class="stat-label">years in infra</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">5+</div>
+      <div class="stat-label">global regions</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">3</div>
+      <div class="stat-label">startups built</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="section-header">
+          <div class="section-tag">01. about</div>
+          <h2 class="section-title">Engineer by trade,<br><span>builder by nature</span></h2>
+        </div>
+        <div class="about-text">
+          <p>I'm a Linux and Infrastructure Engineer with over 8 years of hands-on experience supporting, securing, and automating production systems across global environments. My career started in banking in Uganda and has taken me all the way to fintech at scale with Deriv.</p>
+          <p>Based in Kigali, Rwanda, I currently lead infrastructure at Deriv Africa and hold an AI Champions mandate, where I focus on driving AI adoption and building out the office as an AI hub for the company's continental growth. Outside of that, I'm the founder and developer of <strong style="color:var(--purple-light)">Irema</strong>, a business review platform built specifically for the Rwandan market.</p>
+          <p>Most of what I do sits at the crossroads of infrastructure reliability, intelligent automation, and Africa-focused product development. I care a lot about building things that actually work for people here, which means thinking carefully about multilingual support, mobile-first experiences, and low-bandwidth realities across East Africa.</p>
+        </div>
+      </div>
+      <div>
+        <div class="terminal-box">
+          <div class="terminal-bar">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+            <span class="terminal-title">daniel@deriv-africa: ~</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="t-prompt">daniel@kigali:~$</span> <span class="t-cmd">cat profile.json</span></div>
+            <div class="t-out">{</div>
+            <div class="t-out">&nbsp;&nbsp;"name": "Daniel Kamali",</div>
+            <div class="t-out">&nbsp;&nbsp;"role": "Tech Lead / Infra Engineer",</div>
+            <div class="t-out">&nbsp;&nbsp;"location": "Kigali, Rwanda",</div>
+            <div class="t-out">&nbsp;&nbsp;"employer": "Deriv (Africa Office)",</div>
+            <div class="t-out">&nbsp;&nbsp;"startups": ["Irema", "Milkman RW"],</div>
+            <div class="t-out">&nbsp;&nbsp;"focus": ["Linux", "Cloud", "AI/LLM",</div>
+            <div class="t-out">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"IAM", "Automation"],</div>
+            <div class="t-out">&nbsp;&nbsp;"open_to": "Remote (Global)"</div>
+            <div class="t-out">}</div>
+            <div style="margin-top:12px"><span class="t-prompt">daniel@kigali:~$</span> <span class="cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">02. skills</div>
+      <h2 class="section-title">Technical <span>Toolkit</span></h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--green)">$_</div>
+        <div class="skill-cat-name">Linux & Systems</div>
+        <div class="skill-tags">
+          <span class="skill-tag green">Ubuntu</span>
+          <span class="skill-tag green">CentOS</span>
+          <span class="skill-tag green">System Hardening</span>
+          <span class="skill-tag green">Patching</span>
+          <span class="skill-tag green">Performance Tuning</span>
+          <span class="skill-tag green">Windows Server</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--cyan)">⌁</div>
+        <div class="skill-cat-name">Networking</div>
+        <div class="skill-tags">
+          <span class="skill-tag cyan">LAN/WAN</span>
+          <span class="skill-tag cyan">VPN</span>
+          <span class="skill-tag cyan">Fortigate</span>
+          <span class="skill-tag cyan">Sophos</span>
+          <span class="skill-tag cyan">pfSense</span>
+          <span class="skill-tag cyan">Routing & Switching</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--purple-light)">☁</div>
+        <div class="skill-cat-name">Cloud & Infrastructure</div>
+        <div class="skill-tags">
+          <span class="skill-tag">AWS EC2</span>
+          <span class="skill-tag">VPC</span>
+          <span class="skill-tag">IAM</span>
+          <span class="skill-tag">S3</span>
+          <span class="skill-tag">Proxmox</span>
+          <span class="skill-tag">VMware</span>
+          <span class="skill-tag">IaC</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--green)">⚡</div>
+        <div class="skill-cat-name">Automation & Scripting</div>
+        <div class="skill-tags">
+          <span class="skill-tag green">Python</span>
+          <span class="skill-tag green">Bash</span>
+          <span class="skill-tag green">Ansible</span>
+          <span class="skill-tag green">Okta Workflows</span>
+          <span class="skill-tag green">Cron Jobs</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--purple-light)">◈</div>
+        <div class="skill-cat-name">Monitoring & Reliability</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Datadog</span>
+          <span class="skill-tag">Zabbix</span>
+          <span class="skill-tag">Incident Response</span>
+          <span class="skill-tag">RCA</span>
+          <span class="skill-tag">Alerting</span>
+        </div>
+      </div>
+      <div class="skill-category" style="border: 1px solid rgba(0,255,136,0.2); background: rgba(0,255,136,0.03);">
+        <div class="skill-cat-icon" style="color:var(--green)">✦ AI</div>
+        <div class="skill-cat-name" style="color:var(--green)">AI & LLM Skills</div>
+        <div class="skill-tags">
+          <span class="skill-tag green">Claude / Anthropic</span>
+          <span class="skill-tag green">Prompt Engineering</span>
+          <span class="skill-tag green">LLM Workflows</span>
+          <span class="skill-tag green">AI Automation</span>
+          <span class="skill-tag green">MCP Servers</span>
+          <span class="skill-tag green">AI Strategy</span>
+          <span class="skill-tag green">Firebase + AI</span>
+          <span class="skill-tag green">React AI Apps</span>
+          <span class="skill-tag green">AI Champions Lead</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--cyan)">⚙</div>
+        <div class="skill-cat-name">DevOps & Security</div>
+        <div class="skill-tags">
+          <span class="skill-tag cyan">Jamf</span>
+          <span class="skill-tag cyan">Okta</span>
+          <span class="skill-tag cyan">JumpCloud</span>
+          <span class="skill-tag cyan">Kandji</span>
+          <span class="skill-tag cyan">Vulnerability Mgmt</span>
+          <span class="skill-tag cyan">DR & Backup</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-icon" style="color:var(--purple-light)">◻</div>
+        <div class="skill-cat-name">Development</div>
+        <div class="skill-tags">
+          <span class="skill-tag">React</span>
+          <span class="skill-tag">Firebase</span>
+          <span class="skill-tag">Tailwind CSS</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">Vite</span>
+          <span class="skill-tag">Firestore</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">03. experience</div>
+      <h2 class="section-title">Career <span>Timeline</span></h2>
+    </div>
+    <div class="exp-timeline">
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">Deriv · Africa Office</span>
+          <span class="exp-date">Nov 2024 – Present</span>
+          <span class="exp-current">● CURRENT</span>
+        </div>
+        <div class="exp-role">Tech Lead / Infrastructure Engineer</div>
+        <ul class="exp-bullets">
+          <li>Lead Linux, network and cloud infrastructure across multiple global offices</li>
+          <li>Designed secure network architectures with disaster recovery and backup strategies</li>
+          <li>Deployed Datadog & Zabbix monitoring platforms; reduced incident response time significantly</li>
+          <li>Automated routine IT tasks using Python, Bash, Ansible, and Okta Workflows</li>
+          <li>Leading the AI adoption strategy as the office's AI Champion, working toward positioning the Africa team as a hub for the company's continental expansion</li>
+          <li>Mentored junior engineers; coordinated infrastructure changes with minimal disruption</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">Deriv</span>
+          <span class="exp-date">Apr 2024 – Nov 2024</span>
+        </div>
+        <div class="exp-role">WinOps / Infrastructure Engineer</div>
+        <ul class="exp-bullets">
+          <li>Built and managed AWS environments (EC2, VPC, IAM, S3) across dev, test, and production</li>
+          <li>Automated infrastructure management using scripting and configuration tools</li>
+          <li>Monitored infrastructure health using Datadog with alert integrations</li>
+          <li>Supported incident management, documentation, and root cause analysis</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">Deriv</span>
+          <span class="exp-date">Oct 2022 – Apr 2024</span>
+        </div>
+        <div class="exp-role">IT Admin Team Lead / Infrastructure Engineer</div>
+        <ul class="exp-bullets">
+          <li>Managed global network and server environments across Africa, Europe, Asia and South America</li>
+          <li>Oversaw firewall rules, access control, patching, and endpoint protection</li>
+          <li>Automated repetitive administration tasks to reduce operational overhead</li>
+          <li>Supported infrastructure modernization and cloud migration initiatives</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">Deriv</span>
+          <span class="exp-date">Apr 2021 – Oct 2022</span>
+        </div>
+        <div class="exp-role">IT Operations / Linux & Network Engineer</div>
+        <ul class="exp-bullets">
+          <li>Administered Linux servers, networks, and virtualization platforms</li>
+          <li>Implemented backups, monitoring, and system documentation</li>
+          <li>Supported network infrastructure revamps across multiple international locations</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">UTB Rwanda</span>
+          <span class="exp-date">Dec 2018 – Apr 2021</span>
+        </div>
+        <div class="exp-role">System & Network Administrator</div>
+        <ul class="exp-bullets">
+          <li>Designed and deployed campus-wide LAN/WAN infrastructure</li>
+          <li>Administered Linux and Windows servers, user access, and network security</li>
+          <li>Ensured 24/7 network availability for university operations</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <span class="exp-company">FINCA Bank Uganda</span>
+          <span class="exp-date">2017</span>
+        </div>
+        <div class="exp-role">Assistant System / Network Administrator</div>
+        <ul class="exp-bullets">
+          <li>Supported secure banking infrastructure and ERP systems</li>
+          <li>Managed user access, backups, and system availability in regulated environments</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">04. portfolio</div>
+      <h2 class="section-title">Notable <span>Projects</span></h2>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <div class="project-num">// 001</div>
+        <div class="project-title">Irema Platform</div>
+        <div class="project-desc">Rwandan business review platform built with a full-stack setup covering admin, business, and user portals. Multilingual support across EN, FR, Kinyarwanda, and Swahili. Firebase-backed and designed mobile-first from the ground up.</div>
+        <div class="project-stack">
+          <span class="skill-tag green">React</span>
+          <span class="skill-tag green">Firebase</span>
+          <span class="skill-tag green">Tailwind</span>
+          <span class="skill-tag green">Firestore</span>
+          <span class="skill-tag green">i18n</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">// 002</div>
+        <div class="project-title">Okta IAM Automation</div>
+        <div class="project-desc">End-to-end provisioning workflows triggered by ClickUp approvals. Auto-provisions GitHub/app/group access, verifies org membership, and sends Slack Block Kit notifications.</div>
+        <div class="project-stack">
+          <span class="skill-tag">Okta Workflows</span>
+          <span class="skill-tag">ClickUp API</span>
+          <span class="skill-tag">GitHub API</span>
+          <span class="skill-tag cyan">Slack</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">// 003</div>
+        <div class="project-title">DerivAI: Internal AI Platform</div>
+        <div class="project-desc">React/Firebase internal AI tools platform built for Deriv Rwanda. Each tool card includes real failure modes, stack integration context, and worked examples so the team can actually use AI confidently day to day.</div>
+        <div class="project-stack">
+          <span class="skill-tag green">React</span>
+          <span class="skill-tag green">Firebase</span>
+          <span class="skill-tag green">Claude API</span>
+          <span class="skill-tag green">AI Strategy</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">// 004</div>
+        <div class="project-title">Milkman Rwanda</div>
+        <div class="project-desc">Dairy delivery marketplace webapp for Kigali. Three separate portals covering vendors, riders, and customers, with full i18n support across four languages. Built on Firebase, React, Vite, and Tailwind.</div>
+        <div class="project-stack">
+          <span class="skill-tag">React</span>
+          <span class="skill-tag">Vite</span>
+          <span class="skill-tag">Firebase</span>
+          <span class="skill-tag cyan">Tailwind</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">// 005</div>
+        <div class="project-title">AI Radar: Slack Bot</div>
+        <div class="project-desc">A Slack bot that monitors and surfaces curated AI/LLM updates directly to the Deriv Africa team. Built to keep everyone current on a fast-moving space without flooding people with noise.</div>
+        <div class="project-stack">
+          <span class="skill-tag green">Slack API</span>
+          <span class="skill-tag green">Python</span>
+          <span class="skill-tag green">LLM</span>
+          <span class="skill-tag green">Automation</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">// 006</div>
+        <div class="project-title">Global Network Revamps</div>
+        <div class="project-desc">Led network and infrastructure overhauls across 5+ countries for Deriv. Included MDM rollout (Jamf, Kandji, JumpCloud), monitoring stack deployment, and IaC implementation.</div>
+        <div class="project-stack">
+          <span class="skill-tag">Datadog</span>
+          <span class="skill-tag">Jamf</span>
+          <span class="skill-tag">Ansible</span>
+          <span class="skill-tag cyan">Fortigate</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">05. credentials</div>
+      <h2 class="section-title">Certifications & <span>Education</span></h2>
+    </div>
+    <div class="certs-grid">
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">BSc Computer Science</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">CCNA Routing & Switching</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">CompTIA Security+</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">AWS & Cloud Infrastructure</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">Red Hat Ansible (EX407)</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-icon">◈</div>
+        <div class="cert-name">ISC2 Cybersecurity Certified</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">06. blog</div>
+      <h2 class="section-title">Thoughts & <span>Writings</span></h2>
+    </div>
+    <div class="blog-grid">
+      <div class="blog-card" onclick="window.location.href='blog-ai-team.html'" style="cursor:pointer;">
+        <div class="blog-tag">AI & Infrastructure</div>
+        <div class="blog-title">Building an AI-First Infrastructure Team in Africa</div>
+        <div class="blog-excerpt">How I'm driving AI adoption at Deriv Africa, from building internal tools to getting the team thinking in automation-first workflows. It's been more cultural than technical.</div>
+        <div class="blog-meta"><span>April 2026</span><span>5 min read</span></div>
+      </div>
+      <div class="blog-card" onclick="window.location.href='blog-okta-iam.html'" style="cursor:pointer;">
+        <div class="blog-tag">Automation</div>
+        <div class="blog-title">Okta Workflows: Automating IAM Without Code</div>
+        <div class="blog-excerpt">A practical walkthrough of building end-to-end provisioning pipelines using Okta Workflows, ClickUp, and GitHub. No traditional dev background needed, just logic and patience.</div>
+        <div class="blog-meta"><span>March 2026</span><span>8 min read</span></div>
+      </div>
+      <div class="blog-card" onclick="window.location.href='blog-irema.html'" style="cursor:pointer;">
+        <div class="blog-tag">Startups</div>
+        <div class="blog-title">Lessons from Building Irema: Rwanda's Business Review Platform</div>
+        <div class="blog-excerpt">What I've picked up building a multilingual, mobile-first product for the East African market. The technical side was straightforward. The cultural and business side took a lot more thinking.</div>
+        <div class="blog-meta"><span>March 2026</span><span>6 min read</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="section-header">
+          <div class="section-tag">07. contact</div>
+          <h2 class="section-title">Let's <span>Connect</span></h2>
+        </div>
+        <p>I'm open to senior infrastructure roles, AI strategy consulting, and advisory work at African tech companies. If you want to talk infrastructure, automation, AI, or what's happening in the East African tech space, I'm always up for it.</p>
+        <div class="contact-links">
+          <a href="javascript:void(0)" onclick="openExternal('mailto:danielkamali20@gmail.com')" class="contact-link">
+            <span class="contact-link-icon">@</span>
+            <span class="contact-link-text">danielkamali20@gmail.com</span>
+          </a>
+          <a href="javascript:void(0)" onclick="openExternal('tel:+250780446987')" class="contact-link">
+            <span class="contact-link-icon">☏</span>
+            <span class="contact-link-text">+250 780 446 987</span>
+          </a>
+          <a href="javascript:void(0)" onclick="openExternal('https://www.linkedin.com/in/daniel-kamali')" class="contact-link">
+            <span class="contact-link-icon">in</span>
+            <span class="contact-link-text">linkedin.com/in/daniel-kamali</span>
+          </a>
+          <a href="javascript:void(0)" class="contact-link">
+            <span class="contact-link-icon">⌖</span>
+            <span class="contact-link-text">Kigali, Rwanda · Remote (Global)</span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="contact-form">
+          <div class="form-group">
+            <label class="form-label">your_name</label>
+            <input type="text" class="form-input" placeholder="Jane Recruiter">
+          </div>
+          <div class="form-group">
+            <label class="form-label">your_email</label>
+            <input type="email" class="form-input" placeholder="jane@company.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">subject</label>
+            <input type="text" class="form-input" placeholder="Opportunity / Collaboration / Just saying hi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">message</label>
+            <textarea class="form-input" placeholder="Tell me about the role, project or idea..."></textarea>
+          </div>
+          <button class="btn-primary" style="align-self:flex-start" onclick="alert('Thanks! Daniel will get back to you soon.')">send_message()</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;width:100%">
+    <div class="footer-logo">&gt; <span>daniel_kamali</span>.sh · Kigali, Rwanda</div>
+    <div class="footer-copy">© 2025 Daniel Kamali · Built with passion &amp; terminal energy</div>
+  </div>
+</footer>
+<script>
+  function scrollTo(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Close mobile menu if open
+      document.getElementById('navLinks').classList.remove('open');
+    }
+  }
+
+  function openExternal(url) {
+    window.open(url, '_blank');
+  }
+
+  function toggleTheme() {
+    var html = document.documentElement;
+    var isLight = html.classList.toggle('light');
+    try { localStorage.setItem('dk-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  }
+
+  // Restore saved preference
+  (function() {
+    try {
+      var saved = localStorage.getItem('dk-theme');
+      if (saved === 'light') document.documentElement.classList.add('light');
+    } catch(e) {}
+  })();
+</script>
+</body>
+</html>

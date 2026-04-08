@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building an AI-First Infrastructure Team in Africa | Daniel Kamali</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a14;--bg2:#0e0e1c;--bg3:#12122a;
+    --purple:#7c3aed;--purple-light:#a78bfa;
+    --green:#00ff88;--green-dim:#00cc6a;--green-dark:#003322;
+    --cyan:#22d3ee;--text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#475569;
+    --border:rgba(124,58,237,0.2);--border-green:rgba(0,255,136,0.15);
+    --mono:'Share Tech Mono',monospace;--display:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+    --nav-bg:rgba(10,10,20,0.85);--nav-mobile-bg:#0a0a14;
+    --grid-line:rgba(124,58,237,0.04);--scanline:rgba(0,0,0,0.03);
+  }
+  html.light {
+    --bg:#f8f7ff;--bg2:#f0eeff;--bg3:#e8e3ff;
+    --purple:#6d28d9;--purple-light:#7c3aed;
+    --green:#059669;--green-dim:#047857;--green-dark:#d1fae5;
+    --cyan:#0e7490;--text:#1e1b4b;--text-muted:#4c4980;--text-dim:#7c7aaa;
+    --border:rgba(109,40,217,0.15);--border-green:rgba(5,150,105,0.2);
+    --nav-bg:rgba(248,247,255,0.92);--nav-mobile-bg:#f8f7ff;
+    --grid-line:rgba(109,40,217,0.04);--scanline:rgba(0,0,0,0);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:1000;}
+  .grid-bg{position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .nav-logo{font-family:var(--mono);font-size:14px;color:var(--green);letter-spacing:0.05em;cursor:pointer;}
+  .nav-logo span{color:var(--purple-light);}
+  .nav-back{font-family:var(--mono);font-size:12px;color:var(--text-muted);text-decoration:none;letter-spacing:0.1em;display:flex;align-items:center;gap:8px;cursor:pointer;transition:color 0.2s;}
+  .nav-back:hover{color:var(--green);}
+  .theme-toggle{background:none;border:1px solid var(--border);color:var(--text-muted);width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;flex-shrink:0;}
+  .theme-toggle:hover{border-color:var(--green);color:var(--green);}
+  .theme-toggle .icon-moon{display:block;}
+  .theme-toggle .icon-sun{display:none;}
+  html.light .theme-toggle .icon-moon{display:none;}
+  html.light .theme-toggle .icon-sun{display:block;}
+  .container{max-width:740px;margin:0 auto;padding:0 2rem;}
+  article{position:relative;z-index:1;padding:100px 0 80px;}
+  .post-tag{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
+  .post-tag::after{content:'';flex:1;max-width:60px;height:1px;background:var(--green);opacity:0.4;}
+  .post-title{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:1.5rem;letter-spacing:-0.01em;}
+  .post-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+  .post-meta span{font-family:var(--mono);font-size:12px;color:var(--text-dim);letter-spacing:0.08em;}
+  .post-body{color:var(--text-muted);font-size:16.5px;line-height:1.9;}
+  .post-body p{margin-bottom:1.5rem;}
+  .post-body h2{font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;}
+  .post-body h3{font-family:var(--display);font-size:1.1rem;font-weight:600;color:var(--purple-light);margin:2rem 0 0.75rem;}
+  .post-body ul{padding-left:1.25rem;margin-bottom:1.5rem;}
+  .post-body ul li{margin-bottom:0.5rem;}
+  .post-body strong{color:var(--text);font-weight:500;}
+  .post-body .callout{background:var(--bg2);border-left:3px solid var(--purple-light);padding:1.25rem 1.5rem;margin:2rem 0;border-radius:0 4px 4px 0;}
+  .post-body .callout p{margin-bottom:0;font-size:15px;}
+  .post-body code{font-family:var(--mono);font-size:13px;background:var(--bg3);color:var(--green);padding:2px 7px;border-radius:3px;}
+  .post-footer{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .back-btn{font-family:var(--mono);font-size:13px;letter-spacing:0.1em;padding:12px 28px;background:transparent;color:var(--green);border:1px solid var(--green);cursor:pointer;transition:background 0.2s,color 0.2s;text-decoration:none;display:inline-block;}
+  .back-btn:hover{background:var(--green);color:#000;}
+  html.light .post-body .callout{background:var(--bg2);}
+  html.light .post-body code{background:var(--bg3);color:var(--purple);}
+  footer{position:relative;z-index:1;padding:28px 0;border-top:1px solid var(--border);}
+  .footer-inner{max-width:740px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  .footer-logo{font-family:var(--mono);font-size:13px;color:var(--text-dim);}
+  .footer-logo span{color:var(--green);}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <div class="nav-logo" onclick="goHome()">&gt; <span>daniel_kamali</span>.sh</div>
+  <a href="javascript:void(0)" onclick="goHome()" class="nav-back">&#8592; back to home</a>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <span class="icon-moon">☽</span>
+    <span class="icon-sun">☀</span>
+  </button>
+</nav>
+
+<article>
+  <div class="container">
+    <div class="post-tag">AI &amp; Infrastructure</div>
+    <h1 class="post-title">Building an AI-First Infrastructure Team in Africa</h1>
+    <div class="post-meta">
+      <span>Daniel Kamali</span>
+      <span>April 2026</span>
+      <span>5 min read</span>
+      <span>Deriv Africa · Kigali, Rwanda</span>
+    </div>
+
+    <div class="post-body">
+      <p>When I took on the AI Champions mandate at Deriv Africa, I made one assumption that turned out to be completely wrong. I assumed the hard part would be the technology. It wasn't. The hard part was people, and getting them to actually change how they work.</p>
+
+      <p>We had a capable team. Everyone knew their stack. But most of them were approaching AI tools the same way I see it everywhere else in the industry: trying it once, hitting a confusing output, and quietly going back to the way they'd always done things. That's not resistance. That's just what happens when you hand someone a powerful tool without any real context for how to use it.</p>
+
+      <h2>Starting with honesty</h2>
+
+      <p>The first thing I did was stop pretending AI was going to be magic. A lot of AI adoption programs start with demos that show the best-case scenario. Someone prompts a model perfectly, gets a perfect answer, and the room is impressed. Two weeks later nothing has changed because real work doesn't look like that demo.</p>
+
+      <p>Instead I started with failure modes. When I built out the DerivAI internal platform, every single tool card included three things: what the tool is actually good at, what it gets wrong or struggles with, and a real worked example from our actual environment. Not a generic example. Something using our stack, our terminology, our infrastructure context.</p>
+
+      <div class="callout">
+        <p>The shift I noticed was that once engineers knew a tool's limits, they trusted it more for the things it was actually good at. Knowing where something fails is not discouraging. It's clarifying.</p>
+      </div>
+
+      <h2>The AI Radar approach</h2>
+
+      <p>One of the more practical things I built was a Slack bot I called AI Radar. The idea was simple: the AI space moves faster than anyone can manually track, and most teams end up with one or two people who follow it closely while everyone else falls behind. That gap creates friction.</p>
+
+      <p>AI Radar monitors curated sources and surfaces updates to the team channel, filtered for relevance to our actual work. Infrastructure tooling, IAM automation, LLM integrations with cloud platforms, that kind of thing. Not general AI news. Specific signals that change how we should be working.</p>
+
+      <p>After a few weeks of running it, the conversations in our team changed noticeably. People were coming to planning meetings having already read about something relevant. That's a small shift but it compounds quickly.</p>
+
+      <h2>What actually moved the needle</h2>
+
+      <p>If I had to point to one thing that changed adoption more than anything else, it was the bi-weekly sessions we called AI Wins. No slides, no formal agenda. Just someone on the team walking through a real task they'd done with AI help, showing the actual prompt, the actual output, and what they changed or fixed afterward.</p>
+
+      <p>Watching a colleague do it is completely different from being told it's possible. Especially when they're honest about the iteration involved. When people see that it took three attempts to get a useful Ansible playbook draft, they stop feeling like they're doing it wrong when their first attempt isn't perfect.</p>
+
+      <h2>The Africa angle</h2>
+
+      <p>There are things about working in East Africa that change this conversation in ways I don't see discussed much. Connectivity is a real consideration. Tools that work beautifully on a fiber connection in Amsterdam behave differently on a variable connection in Kigali. Latency affects how people experience AI tools, and if the experience is slow and inconsistent, adoption drops fast.</p>
+
+      <p>We also operate across multiple regulatory environments. The team touches systems in several African markets, each with its own compliance picture. That means AI-assisted automation has to be approached carefully. Not avoided, but thought through. I've spent a good amount of time building internal guidelines for what kinds of tasks are appropriate for AI assistance and what still requires a human sign-off.</p>
+
+      <p>The multilingual dimension matters too. English is the working language but it's not everyone's first language. Prompting in English and getting outputs in English works fine operationally, but when I'm thinking about tools that will eventually reach end users across the continent, the language question becomes central.</p>
+
+      <h2>Where things stand now</h2>
+
+      <p>We're not done. Honestly, I'm not sure there's a "done" in this space given how quickly things are moving. But the team is in a different place than it was a year ago. AI is part of how we approach work now, not something people are waiting to be told to use.</p>
+
+      <p>The biggest lesson for me has been that building an AI-first team is less about implementing tools and more about building confidence. Confidence that the tools are reliable for specific tasks, confidence that it's okay to iterate and fail, and confidence that understanding a tool's weaknesses is a skill worth developing.</p>
+
+      <p>That's really what the AI Champions role has been about. Not evangelism. Just making it easier for good engineers to get comfortable with a new way of working.</p>
+    </div>
+
+    <div class="post-footer">
+      <a href="javascript:void(0)" onclick="goHome(); setTimeout(()=>document.getElementById('blog').scrollIntoView({behavior:'smooth'}),300)" class="back-btn">&#8592; all posts</a>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">daniel@kigali</span>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">&gt; <span>daniel_kamali</span>.sh · Kigali, Rwanda</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">© 2026 Daniel Kamali</div>
+  </div>
+</footer>
+
+<script>
+  function goHome() { window.location.href = 'index.html'; }
+  function toggleTheme() {
+    var html = document.documentElement;
+    var isLight = html.classList.toggle('light');
+    try { localStorage.setItem('dk-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  }
+  (function() {
+    try { if (localStorage.getItem('dk-theme') === 'light') document.documentElement.classList.add('light'); } catch(e) {}
+  })();
+</script>
+</body>
+</html>

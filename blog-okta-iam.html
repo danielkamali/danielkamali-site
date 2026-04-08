@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okta Workflows: Automating IAM Without Code | Daniel Kamali</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a14;--bg2:#0e0e1c;--bg3:#12122a;
+    --purple:#7c3aed;--purple-light:#a78bfa;
+    --green:#00ff88;--green-dim:#00cc6a;--green-dark:#003322;
+    --cyan:#22d3ee;--text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#475569;
+    --border:rgba(124,58,237,0.2);--border-green:rgba(0,255,136,0.15);
+    --mono:'Share Tech Mono',monospace;--display:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+    --nav-bg:rgba(10,10,20,0.85);--nav-mobile-bg:#0a0a14;
+    --grid-line:rgba(124,58,237,0.04);--scanline:rgba(0,0,0,0.03);
+  }
+  html.light {
+    --bg:#f8f7ff;--bg2:#f0eeff;--bg3:#e8e3ff;
+    --purple:#6d28d9;--purple-light:#7c3aed;
+    --green:#059669;--green-dim:#047857;--green-dark:#d1fae5;
+    --cyan:#0e7490;--text:#1e1b4b;--text-muted:#4c4980;--text-dim:#7c7aaa;
+    --border:rgba(109,40,217,0.15);--border-green:rgba(5,150,105,0.2);
+    --nav-bg:rgba(248,247,255,0.92);--nav-mobile-bg:#f8f7ff;
+    --grid-line:rgba(109,40,217,0.04);--scanline:rgba(0,0,0,0);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:1000;}
+  .grid-bg{position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .nav-logo{font-family:var(--mono);font-size:14px;color:var(--green);letter-spacing:0.05em;cursor:pointer;}
+  .nav-logo span{color:var(--purple-light);}
+  .nav-back{font-family:var(--mono);font-size:12px;color:var(--text-muted);text-decoration:none;letter-spacing:0.1em;display:flex;align-items:center;gap:8px;cursor:pointer;transition:color 0.2s;}
+  .nav-back:hover{color:var(--green);}
+  .theme-toggle{background:none;border:1px solid var(--border);color:var(--text-muted);width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;flex-shrink:0;}
+  .theme-toggle:hover{border-color:var(--green);color:var(--green);}
+  .theme-toggle .icon-moon{display:block;}
+  .theme-toggle .icon-sun{display:none;}
+  html.light .theme-toggle .icon-moon{display:none;}
+  html.light .theme-toggle .icon-sun{display:block;}
+  .container{max-width:740px;margin:0 auto;padding:0 2rem;}
+  article{position:relative;z-index:1;padding:100px 0 80px;}
+  .post-tag{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
+  .post-tag::after{content:'';flex:1;max-width:60px;height:1px;background:var(--green);opacity:0.4;}
+  .post-title{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:1.5rem;letter-spacing:-0.01em;}
+  .post-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+  .post-meta span{font-family:var(--mono);font-size:12px;color:var(--text-dim);letter-spacing:0.08em;}
+  .post-body{color:var(--text-muted);font-size:16.5px;line-height:1.9;}
+  .post-body p{margin-bottom:1.5rem;}
+  .post-body h2{font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;}
+  .post-body h3{font-family:var(--display);font-size:1.1rem;font-weight:600;color:var(--purple-light);margin:2rem 0 0.75rem;}
+  .post-body ul{padding-left:1.25rem;margin-bottom:1.5rem;}
+  .post-body ul li{margin-bottom:0.5rem;}
+  .post-body strong{color:var(--text);font-weight:500;}
+  .post-body .callout{background:var(--bg2);border-left:3px solid var(--purple-light);padding:1.25rem 1.5rem;margin:2rem 0;border-radius:0 4px 4px 0;}
+  .post-body .callout p{margin-bottom:0;font-size:15px;}
+  .post-body code{font-family:var(--mono);font-size:13px;background:var(--bg3);color:var(--green);padding:2px 7px;border-radius:3px;}
+  .post-body .code-block{background:var(--bg3);border:1px solid var(--border-green);padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:4px;font-family:var(--mono);font-size:13px;color:var(--green);line-height:1.8;overflow-x:auto;}
+  .post-footer{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .back-btn{font-family:var(--mono);font-size:13px;letter-spacing:0.1em;padding:12px 28px;background:transparent;color:var(--green);border:1px solid var(--green);cursor:pointer;transition:background 0.2s,color 0.2s;text-decoration:none;display:inline-block;}
+  .back-btn:hover{background:var(--green);color:#000;}
+  html.light .post-body .callout{background:var(--bg2);}
+  html.light .post-body code{background:var(--bg3);color:var(--purple);}
+  html.light .post-body .code-block{color:var(--purple);}
+  footer{position:relative;z-index:1;padding:28px 0;border-top:1px solid var(--border);}
+  .footer-inner{max-width:740px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  .footer-logo{font-family:var(--mono);font-size:13px;color:var(--text-dim);}
+  .footer-logo span{color:var(--green);}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <div class="nav-logo" onclick="goHome()">&gt; <span>daniel_kamali</span>.sh</div>
+  <a href="javascript:void(0)" onclick="goHome()" class="nav-back">&#8592; back to home</a>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <span class="icon-moon">☽</span>
+    <span class="icon-sun">☀</span>
+  </button>
+</nav>
+
+<article>
+  <div class="container">
+    <div class="post-tag">Automation</div>
+    <h1 class="post-title">Okta Workflows: Automating IAM Without Writing Traditional Code</h1>
+    <div class="post-meta">
+      <span>Daniel Kamali</span>
+      <span>March 2026</span>
+      <span>8 min read</span>
+      <span>IAM · Automation · Deriv</span>
+    </div>
+
+    <div class="post-body">
+      <p>Access management at a global fintech company is messier than it sounds. You've got engineers joining, moving between teams, getting access to systems they shouldn't have anymore, and off-boarding processes that rely on someone remembering to click the right buttons. We had all of that. The fix didn't require a development team or a six-month project. It required Okta Workflows, a bit of patience, and learning to think in flow diagrams instead of code.</p>
+
+      <p>This post walks through how I built an end-to-end GitHub provisioning workflow triggered entirely from ClickUp task approvals. No custom backend. No scheduled scripts. Just logic connected together with the right API calls at the right points.</p>
+
+      <h2>The problem we were solving</h2>
+
+      <p>The old process went something like this: a manager would approve a new joiner's access in a ticket, someone on the IT side would eventually see it, manually extract the GitHub username from the comments, add them to the right org and teams, then update the ticket. It worked until people got busy. Then tickets sat. Then engineers started their first week without the access they needed.</p>
+
+      <p>We needed the whole thing automated. Approval in ClickUp triggers provisioning in GitHub, verifies it worked, and updates the ticket status automatically. No human in the loop for the routine case.</p>
+
+      <h2>How Okta Workflows fits in</h2>
+
+      <p>Okta Workflows is a no-code automation platform built into Okta. If you're already using Okta for IAM, which most serious companies are, you have access to it. It's not as flexible as writing Python, but for IAM automation it's actually more appropriate because it runs inside your identity layer, has native connectors to the tools you're already using, and doesn't need a server to sit on.</p>
+
+      <p>The mental model is similar to tools like Zapier or Make, but with direct access to Okta's user and group management primitives. That matters a lot for what we were building.</p>
+
+      <h2>The flow structure</h2>
+
+      <p>The main workflow gets triggered when a ClickUp task moves to an "Approved" status. From there it needs to:</p>
+
+      <ul>
+        <li>Read the task comments to find the GitHub username (engineers submitted these in a standard format ending in <code>-deriv</code>)</li>
+        <li>Look up the correct Okta group based on the team specified in the task</li>
+        <li>Assign the user to that group, which in turn pushes the GitHub org invitation</li>
+        <li>Call the GitHub API to verify the membership actually landed</li>
+        <li>Update the ClickUp task status and add a comment confirming what was done</li>
+        <li>Send a Slack notification to the team channel</li>
+      </ul>
+
+      <p>Each of those steps sounds straightforward until you start building. The tricky parts are worth explaining.</p>
+
+      <h2>Extracting the username from comments</h2>
+
+      <p>ClickUp doesn't give you a structured field for GitHub usernames. Engineers wrote them in free text comments. So I needed to parse a comment string and reliably pull out the username.</p>
+
+      <p>Okta Workflows has a <strong>Find Pattern</strong> card and a <strong>Text Segment</strong> card. Used together, you can locate a pattern in a string and extract the text at a specific position relative to it. I built this as a helper flow, which is essentially a reusable function in Workflows. The main flow calls the helper, passes in the raw comment text, and gets back just the username.</p>
+
+      <div class="callout">
+        <p>One thing that tripped me up early: helper flows in Okta Workflows have limited ways to return values. You can't use a For Each loop inside a helper that needs to return a result, because the return card doesn't work cleanly from inside a loop. Structure your logic to avoid that early and you'll save yourself debugging time later.</p>
+      </div>
+
+      <h2>Dynamic group lookups</h2>
+
+      <p>We didn't want to hardcode group names into the workflow. If a team is renamed or a new team is added, a hardcoded workflow breaks silently. Instead, the workflow constructs the group name dynamically by concatenating values from the task fields, then calls Okta's List Groups API with that constructed name as the search parameter.</p>
+
+      <div class="code-block">
+        # Group name construction example<br>
+        team_slug = task.custom_fields["team"].toLowerCase()<br>
+        group_name = "github-" + team_slug + "-deriv"<br>
+        # Then: Okta List Groups → filter by name equals group_name
+      </div>
+
+      <p>This way, adding a new team just means creating the Okta group with the right naming convention. The workflow figures out the rest.</p>
+
+      <h2>GitHub verification</h2>
+
+      <p>Okta pushing a group assignment doesn't immediately mean GitHub membership is active. There's a sync delay. The workflow handles this by calling the GitHub API directly after the Okta assignment, checking whether the user appears as an org member. If they don't appear within a reasonable window, the workflow updates the ClickUp task with a flag rather than silently succeeding.</p>
+
+      <p>That flag is important. It means an engineer can see at a glance whether their provisioning completed or needs a follow-up. It also means the IT team isn't flying blind on failures.</p>
+
+      <h2>The Slack notification</h2>
+
+      <p>The final step uses Slack Block Kit to send a formatted message to the team channel. Not just "access granted" but the full context: who was provisioned, what team, what GitHub org, and a link back to the original ClickUp task. Block Kit lets you structure this properly so it doesn't look like a bot wrote it.</p>
+
+      <h2>What I'd do differently</h2>
+
+      <p>The main thing I'd change is adding more structured logging from the start. Okta Workflows has an execution history, but when you're debugging a failure three weeks after building something, you want richer context than the default output gives you. I've since added comment cards at key decision points that write state to a log task in ClickUp, which makes debugging significantly faster.</p>
+
+      <p>I'd also plan for the off-boarding mirror earlier. We built the provisioning flow first, then realised we'd need to build an equivalent de-provisioning flow that ran the same logic in reverse. Building them together from the start would have saved time because several of the helper flows are shared.</p>
+
+      <h2>The bigger picture</h2>
+
+      <p>The reason I think this approach is worth writing about is that it shifts who can own IAM automation. You don't need a developer to maintain this. Anyone on an IT or ops team who can think through a process logically can build and maintain Okta Workflows. That changes the ownership model in a meaningful way and means these automations actually get updated when the underlying processes change, rather than sitting as black-box scripts that only one person understands.</p>
+
+      <p>For a team operating across multiple time zones and geographies, that resilience matters more than technical elegance.</p>
+    </div>
+
+    <div class="post-footer">
+      <a href="javascript:void(0)" onclick="goHome(); setTimeout(()=>document.getElementById('blog').scrollIntoView({behavior:'smooth'}),300)" class="back-btn">&#8592; all posts</a>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">daniel@kigali</span>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">&gt; <span>daniel_kamali</span>.sh · Kigali, Rwanda</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">© 2026 Daniel Kamali</div>
+  </div>
+</footer>
+
+<script>
+  function goHome() { window.location.href = 'index.html'; }
+  function toggleTheme() {
+    var html = document.documentElement;
+    var isLight = html.classList.toggle('light');
+    try { localStorage.setItem('dk-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  }
+  (function() {
+    try { if (localStorage.getItem('dk-theme') === 'light') document.documentElement.classList.add('light'); } catch(e) {}
+  })();
+</script>
+</body>
+</html>

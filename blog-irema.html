@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lessons from Building Irema | Daniel Kamali</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a14;--bg2:#0e0e1c;--bg3:#12122a;
+    --purple:#7c3aed;--purple-light:#a78bfa;
+    --green:#00ff88;--green-dim:#00cc6a;--green-dark:#003322;
+    --cyan:#22d3ee;--text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#475569;
+    --border:rgba(124,58,237,0.2);--border-green:rgba(0,255,136,0.15);
+    --mono:'Share Tech Mono',monospace;--display:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+    --nav-bg:rgba(10,10,20,0.85);--nav-mobile-bg:#0a0a14;
+    --grid-line:rgba(124,58,237,0.04);--scanline:rgba(0,0,0,0.03);
+  }
+  html.light {
+    --bg:#f8f7ff;--bg2:#f0eeff;--bg3:#e8e3ff;
+    --purple:#6d28d9;--purple-light:#7c3aed;
+    --green:#059669;--green-dim:#047857;--green-dark:#d1fae5;
+    --cyan:#0e7490;--text:#1e1b4b;--text-muted:#4c4980;--text-dim:#7c7aaa;
+    --border:rgba(109,40,217,0.15);--border-green:rgba(5,150,105,0.2);
+    --nav-bg:rgba(248,247,255,0.92);--nav-mobile-bg:#f8f7ff;
+    --grid-line:rgba(109,40,217,0.04);--scanline:rgba(0,0,0,0);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:1000;}
+  .grid-bg{position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .nav-logo{font-family:var(--mono);font-size:14px;color:var(--green);letter-spacing:0.05em;cursor:pointer;}
+  .nav-logo span{color:var(--purple-light);}
+  .nav-back{font-family:var(--mono);font-size:12px;color:var(--text-muted);text-decoration:none;letter-spacing:0.1em;display:flex;align-items:center;gap:8px;cursor:pointer;transition:color 0.2s;}
+  .nav-back:hover{color:var(--green);}
+  .theme-toggle{background:none;border:1px solid var(--border);color:var(--text-muted);width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;flex-shrink:0;}
+  .theme-toggle:hover{border-color:var(--green);color:var(--green);}
+  .theme-toggle .icon-moon{display:block;}
+  .theme-toggle .icon-sun{display:none;}
+  html.light .theme-toggle .icon-moon{display:none;}
+  html.light .theme-toggle .icon-sun{display:block;}
+  .container{max-width:740px;margin:0 auto;padding:0 2rem;}
+  article{position:relative;z-index:1;padding:100px 0 80px;}
+  .post-tag{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
+  .post-tag::after{content:'';flex:1;max-width:60px;height:1px;background:var(--green);opacity:0.4;}
+  .post-title{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:1.5rem;letter-spacing:-0.01em;}
+  .post-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+  .post-meta span{font-family:var(--mono);font-size:12px;color:var(--text-dim);letter-spacing:0.08em;}
+  .post-body{color:var(--text-muted);font-size:16.5px;line-height:1.9;}
+  .post-body p{margin-bottom:1.5rem;}
+  .post-body h2{font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;}
+  .post-body h3{font-family:var(--display);font-size:1.1rem;font-weight:600;color:var(--purple-light);margin:2rem 0 0.75rem;}
+  .post-body ul{padding-left:1.25rem;margin-bottom:1.5rem;}
+  .post-body ul li{margin-bottom:0.5rem;}
+  .post-body strong{color:var(--text);font-weight:500;}
+  .post-body .callout{background:var(--bg2);border-left:3px solid var(--purple-light);padding:1.25rem 1.5rem;margin:2rem 0;border-radius:0 4px 4px 0;}
+  .post-body .callout p{margin-bottom:0;font-size:15px;}
+  .post-body code{font-family:var(--mono);font-size:13px;background:var(--bg3);color:var(--green);padding:2px 7px;border-radius:3px;}
+  .post-footer{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .back-btn{font-family:var(--mono);font-size:13px;letter-spacing:0.1em;padding:12px 28px;background:transparent;color:var(--green);border:1px solid var(--green);cursor:pointer;transition:background 0.2s,color 0.2s;text-decoration:none;display:inline-block;}
+  .back-btn:hover{background:var(--green);color:#000;}
+  html.light .post-body .callout{background:var(--bg2);}
+  html.light .post-body code{background:var(--bg3);color:var(--purple);}
+  footer{position:relative;z-index:1;padding:28px 0;border-top:1px solid var(--border);}
+  .footer-inner{max-width:740px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  .footer-logo{font-family:var(--mono);font-size:13px;color:var(--text-dim);}
+  .footer-logo span{color:var(--green);}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <div class="nav-logo" onclick="goHome()">&gt; <span>daniel_kamali</span>.sh</div>
+  <a href="javascript:void(0)" onclick="goHome()" class="nav-back">&#8592; back to home</a>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <span class="icon-moon">☽</span>
+    <span class="icon-sun">☀</span>
+  </button>
+</nav>
+
+<article>
+  <div class="container">
+    <div class="post-tag">Startups</div>
+    <h1 class="post-title">Lessons from Building Irema: Rwanda's Business Review Platform</h1>
+    <div class="post-meta">
+      <span>Daniel Kamali</span>
+      <span>March 2026</span>
+      <span>6 min read</span>
+      <span>Product · East Africa · Firebase</span>
+    </div>
+
+    <div class="post-body">
+      <p>I've been building software long enough to know that the technical decisions are rarely the hardest ones. Irema, the business review platform I've been developing for the Rwandan market, has reinforced that more than any other project I've worked on. The stack was straightforward. Everything around it required a lot more thought.</p>
+
+      <p>Irema is a platform where people can find and review local businesses in Rwanda, similar conceptually to what Yelp or Google Reviews does in other markets, but built specifically for how businesses and consumers operate here. That specificity turned out to be both the point and the source of most of the interesting problems.</p>
+
+      <h2>Why not just adapt something that already exists</h2>
+
+      <p>The honest answer is that I tried that first. There are review platforms that work globally and Rwanda is technically reachable by all of them. But the coverage is thin, the categories don't match the local business landscape well, and they're not built with the Rwandan user in mind. Someone looking for a <em>moto taxi</em> company or a local materials supplier doesn't find much.</p>
+
+      <p>More practically, the trust dynamics are different. Review culture in East Africa is still developing. People are more likely to trust a recommendation from someone in their network than a review from a stranger, which means the platform has to build credibility differently than platforms built for markets where anonymous reviews are already a habit.</p>
+
+      <h2>The language problem is real</h2>
+
+      <p>Rwanda has four working languages depending on context: Kinyarwanda, French, English, and increasingly Swahili as regional integration deepens. Building for one of them and hoping it covers the others doesn't work. People switch between languages fluidly and expect software to keep up.</p>
+
+      <p>I implemented i18n from the start using a standard <code>react-i18next</code> setup, with translation files for all four languages. The technical part was manageable. The harder part was content. Machine translation handles interface strings reasonably well but falls apart on anything that requires cultural context. Some concepts don't translate cleanly. Some phrases that sound natural in English come across as overly formal in Kinyarwanda.</p>
+
+      <p>We ended up doing a review pass with native speakers for the core UI strings, which added time but was genuinely necessary. There's no shortcut for that and I'd build the timeline to include it from the beginning next time.</p>
+
+      <h2>Mobile-first means something different here</h2>
+
+      <p>When people in tech say mobile-first, they usually mean responsive design and touch targets. In the East African context it means something more specific: the majority of users are on mid-range Android devices, often on 4G connections that aren't consistently fast, and many people use their phone as their only computing device.</p>
+
+      <p>That changes decisions that normally feel minor. Image loading strategy matters more. Bundle size matters more. The assumption that a user will complete a multi-step flow in a single sitting is less reliable when they might get a call in the middle or switch apps. I started designing flows to be resumable rather than linear, which required more thought about state management but produced a much better experience for actual users.</p>
+
+      <div class="callout">
+        <p>One useful test I started doing: pull up the app on a throttled connection and walk through the core flows. If anything feels frustrating under those conditions, it will be frustrating for a meaningful share of real users. That test caught several things that looked fine in development.</p>
+      </div>
+
+      <h2>The Firestore security rules took longer than expected</h2>
+
+      <p>For anyone building a multi-role Firebase application, the security rules layer deserves more time than you'll initially allocate for it. Irema has admin, business owner, and public user roles, each with different read and write permissions across multiple collections. Getting that right in Firestore rules, rather than just handling it in application logic, took several iterations.</p>
+
+      <p>The reason it matters is that client-side permission checks can be bypassed. Firestore rules are enforced at the database level. If you rely on your React code to hide the delete button from the wrong users but don't enforce it in the rules, you have a security hole. I spent time on a proper security audit of the live app and found a few things that needed tightening, which I was glad to catch before the platform had significant user data.</p>
+
+      <h2>What I underestimated about the business side</h2>
+
+      <p>Rwanda has a real regulatory environment for digital platforms. The Rwanda Development Board handles business registration and RURA covers digital and telecommunications services. Understanding what category Irema falls into and what compliance obligations that creates took research I hadn't fully planned for.</p>
+
+      <p>I also underestimated how much of the early work would be on the business development side rather than the product side. Getting businesses to claim their profiles and engage with reviews requires direct outreach. The platform doesn't grow on its own just because it exists. That sounds obvious in retrospect but it's easy to think of a platform launch as the finish line when it's actually the start of a different kind of work.</p>
+
+      <h2>What's worked well</h2>
+
+      <p>The Firebase and React stack has been genuinely good for this project. Firebase's realtime capabilities handle the review feed naturally, the authentication layer handled the multi-role setup without too much friction once the rules were right, and Firebase Hosting made deployment straightforward. For a solo developer working on a side project alongside a full-time role, not having to manage servers made a meaningful difference to how much I could actually ship.</p>
+
+      <p>Building in public within the local tech community has also been valuable. Kigali has a growing developer and startup ecosystem and people are genuinely interested in locally built products. Some of my most useful feedback has come from conversations at community events rather than formal user research sessions.</p>
+
+      <h2>Where it goes from here</h2>
+
+      <p>The immediate focus is user growth and making the business verification process smooth enough that more businesses want to participate. A verified badge from a platform they trust matters to business owners here, and building that trust takes consistency over time.</p>
+
+      <p>Longer term, the data that a platform like this accumulates, about which businesses people trust, which categories have strong demand and thin supply, which neighbourhoods are underserved, is genuinely useful for anyone thinking about the Rwandan market. I'm still figuring out what the right way to make that useful is without compromising the trust of the people who contributed to it.</p>
+
+      <p>That balance, between data utility and user trust, is probably the most interesting problem left to solve. And it's not a technical problem at all.</p>
+    </div>
+
+    <div class="post-footer">
+      <a href="javascript:void(0)" onclick="goHome(); setTimeout(()=>document.getElementById('blog').scrollIntoView({behavior:'smooth'}),300)" class="back-btn">&#8592; all posts</a>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">daniel@kigali</span>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">&gt; <span>daniel_kamali</span>.sh · Kigali, Rwanda</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);">© 2026 Daniel Kamali</div>
+  </div>
+</footer>
+
+<script>
+  function goHome() { window.location.href = 'index.html'; }
+  function toggleTheme() {
+    var html = document.documentElement;
+    var isLight = html.classList.toggle('light');
+    try { localStorage.setItem('dk-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  }
+  (function() {
+    try { if (localStorage.getItem('dk-theme') === 'light') document.documentElement.classList.add('light'); } catch(e) {}
+  })();
+</script>
+</body>
+</html>
