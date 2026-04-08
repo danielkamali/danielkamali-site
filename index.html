@@ -1059,14 +1059,14 @@
 <nav>
   <div class="nav-logo">&gt; <span>daniel_kamali</span>.sh</div>
   <ul class="nav-links" id="navLinks">
-    <li><a href="javascript:void(0)" onclick="scrollTo('about')">about</a></li>
-    <li><a href="javascript:void(0)" onclick="scrollTo('skills')">skills</a></li>
-    <li><a href="javascript:void(0)" onclick="scrollTo('experience')">experience</a></li>
-    <li><a href="javascript:void(0)" onclick="scrollTo('portfolio')">portfolio</a></li>
-    <li><a href="javascript:void(0)" onclick="scrollTo('blog')">blog</a></li>
-    <li><a href="javascript:void(0)" onclick="scrollTo('contact')">contact</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('about')">about</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('skills')">skills</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('experience')">experience</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('portfolio')">portfolio</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('blog')">blog</a></li>
+    <li><a href="javascript:void(0)" onclick="navScrollTo('contact')">contact</a></li>
   </ul>
-  <a href="javascript:void(0)" onclick="scrollTo('contact')" class="nav-cta">hire_me</a>
+  <a href="javascript:void(0)" onclick="openHireMe()" class="nav-cta">hire_me</a>
   <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode" onclick="toggleTheme()">
     <span class="icon-moon">☽</span>
     <span class="icon-sun">☀</span>
@@ -1095,8 +1095,8 @@
       <span class="badge badge-purple">Founder · Irema</span>
     </div>
     <div class="hero-ctas">
-      <a href="javascript:void(0)" onclick="scrollTo('contact')" class="btn-primary">get_in_touch()</a>
-      <a href="javascript:void(0)" onclick="scrollTo('portfolio')" class="btn-outline">view_work()</a>
+      <a href="javascript:void(0)" onclick="openHireMe()" class="btn-primary">get_in_touch()</a>
+      <a href="javascript:void(0)" onclick="navScrollTo('portfolio')" class="btn-outline">view_work()</a>
     </div>
   </div>
   <div class="hero-stats">
@@ -1500,19 +1500,19 @@
       <h2 class="section-title">Thoughts & <span>Writings</span></h2>
     </div>
     <div class="blog-grid">
-      <div class="blog-card" onclick="window.location.href='blog-ai-team.html'" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('blog-ai-team.html')" style="cursor:pointer;">
         <div class="blog-tag">AI & Infrastructure</div>
         <div class="blog-title">Building an AI-First Infrastructure Team in Africa</div>
         <div class="blog-excerpt">How I'm driving AI adoption at Deriv Africa, from building internal tools to getting the team thinking in automation-first workflows. It's been more cultural than technical.</div>
         <div class="blog-meta"><span>April 2026</span><span>5 min read</span></div>
       </div>
-      <div class="blog-card" onclick="window.location.href='blog-okta-iam.html'" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('blog-okta-iam.html')" style="cursor:pointer;">
         <div class="blog-tag">Automation</div>
         <div class="blog-title">Okta Workflows: Automating IAM Without Code</div>
         <div class="blog-excerpt">A practical walkthrough of building end-to-end provisioning pipelines using Okta Workflows, ClickUp, and GitHub. No traditional dev background needed, just logic and patience.</div>
         <div class="blog-meta"><span>March 2026</span><span>8 min read</span></div>
       </div>
-      <div class="blog-card" onclick="window.location.href='blog-irema.html'" style="cursor:pointer;">
+      <div class="blog-card" onclick="openBlog('blog-irema.html')" style="cursor:pointer;">
         <div class="blog-tag">Startups</div>
         <div class="blog-title">Lessons from Building Irema: Rwanda's Business Review Platform</div>
         <div class="blog-excerpt">What I've picked up building a multilingual, mobile-first product for the East African market. The technical side was straightforward. The cultural and business side took a lot more thinking.</div>
@@ -1583,14 +1583,65 @@
     <div class="footer-copy">© 2025 Daniel Kamali · Built with passion &amp; terminal energy</div>
   </div>
 </footer>
+<!-- HIRE ME MODAL -->
+<div id="hireMeModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--bg2);border:1px solid var(--border);max-width:480px;width:100%;padding:2.5rem;position:relative;">
+    <button onclick="closeHireMe()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;">&#x2715;</button>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">available for hire</div>
+    <h2 style="font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--text);margin-bottom:0.75rem;">Let's work together</h2>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.7;margin-bottom:2rem;">Open to senior infrastructure roles, AI strategy consulting, and advisory work at African tech companies. Reach out directly and I'll get back to you promptly.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <a href="javascript:void(0)" onclick="openExternal('mailto:danielkamali20@gmail.com')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);background:var(--bg);text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-family:var(--mono);font-size:16px;color:var(--green);width:24px;">@</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">email</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">danielkamali20@gmail.com</div>
+        </div>
+      </a>
+      <a href="javascript:void(0)" onclick="openExternal('https://www.linkedin.com/in/daniel-kamali')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);background:var(--bg);text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-family:var(--mono);font-size:14px;color:var(--green);width:24px;font-weight:700;">in</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">linkedin</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">linkedin.com/in/daniel-kamali</div>
+        </div>
+      </a>
+      <a href="javascript:void(0)" onclick="openExternal('tel:+250780446987')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);background:var(--bg);text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-family:var(--mono);font-size:16px;color:var(--green);width:24px;">&#9742;</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">phone</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">+250 780 446 987</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
 <script>
-  function scrollTo(id) {
+  // Renamed to avoid clashing with window.scrollTo()
+  function navScrollTo(id) {
     var el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Close mobile menu if open
+      var navHeight = 60;
+      var top = el.getBoundingClientRect().top + window.pageYOffset - navHeight;
+      window.scrollTo({ top: top, behavior: 'smooth' });
       document.getElementById('navLinks').classList.remove('open');
     }
+  }
+
+  // Blog navigation
+  function openBlog(page) {
+    window.location.href = page;
+  }
+
+  // Hire me modal
+  function openHireMe() {
+    document.getElementById('hireMeModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeHireMe() {
+    document.getElementById('hireMeModal').style.display = 'none';
+    document.body.style.overflow = '';
   }
 
   function openExternal(url) {
@@ -1603,13 +1654,17 @@
     try { localStorage.setItem('dk-theme', isLight ? 'light' : 'dark'); } catch(e) {}
   }
 
-  // Restore saved preference
   (function() {
     try {
       var saved = localStorage.getItem('dk-theme');
       if (saved === 'light') document.documentElement.classList.add('light');
     } catch(e) {}
   })();
+
+  // Close modal on backdrop click
+  document.getElementById('hireMeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeHireMe();
+  });
 </script>
 </body>
 </html>
